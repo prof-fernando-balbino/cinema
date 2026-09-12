@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.edu.ifms.cinema.model.MovieDetails;
 import br.edu.ifms.cinema.model.MovieResults;
 
 @Service
@@ -20,6 +21,7 @@ public class MovieService {
             .build();
     }
 
+    //Retorna todos os filmes disponíveis na API
     public MovieResults buscarFilmes(Integer page) {
         String uri = UriComponentsBuilder
             .fromPath("/discover/movie")
@@ -28,6 +30,28 @@ public class MovieService {
             .toUriString();
 
         return restClient.get().uri(uri).retrieve().body(MovieResults.class);
+    }
+
+    //Retorna apenas os filmes que contêm palavras-chaves no título
+    public MovieResults buscarFilmesPorTitulo(String query, Integer page) {
+        String uri = UriComponentsBuilder
+            .fromPath("/search/movie")
+            .queryParam("query", query)
+            .queryParam("language", "pt-BR")
+            .queryParam("page", page)
+            .toUriString();
+
+        return restClient.get().uri(uri).retrieve().body(MovieResults.class);
+    }
+
+    public MovieDetails buscarFilmesPorId(Integer id) {
+        String uri = UriComponentsBuilder
+            .fromPath("/movie/{id}")
+            .queryParam("language", "pt-BR")
+            .buildAndExpand(id)
+            .toUriString();
+
+        return restClient.get().uri(uri).retrieve().body(MovieDetails.class);
     }
 
 }
