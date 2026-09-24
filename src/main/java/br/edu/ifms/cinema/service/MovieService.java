@@ -12,12 +12,17 @@ import br.edu.ifms.cinema.model.MovieResults;
 public class MovieService {
     
     private final RestClient restClient;
+    private final RestClient restClientImage;
 
-    //instanciar um objeto do tipo RestClient
+    //Instancia objetos do tipo RestClient
     public MovieService(@Value("${tmdb.api.token}") String token) {
         restClient = RestClient.builder()
             .baseUrl("https://api.themoviedb.org/3")
             .defaultHeader("Authorization", "Bearer " + token)
+            .build();
+        
+        restClientImage = RestClient.builder()
+            .baseUrl("https://image.tmdb.org/t/p/original")
             .build();
     }
 
@@ -44,6 +49,7 @@ public class MovieService {
         return restClient.get().uri(uri).retrieve().body(MovieResults.class);
     }
 
+    //Retorna os detalhes do filme com o id informado como parâmetro
     public MovieDetails buscarFilmesPorId(Integer id) {
         String uri = UriComponentsBuilder
             .fromPath("/movie/{id}")
@@ -52,6 +58,11 @@ public class MovieService {
             .toUriString();
 
         return restClient.get().uri(uri).retrieve().body(MovieDetails.class);
+    }
+
+    //Retorna o arquivo de imagem do poster do filme
+    public byte[] buscarPoster(String filename) {
+        return restClientImage.get().uri(filename).retrieve().body(byte[].class);
     }
 
 }
